@@ -1,6 +1,7 @@
 class Graph:
     def __init__(self):
         self.graph = {}
+        self.vertices = {}
 
     def set_graph(self, dictionary):
         self.graph = dictionary
@@ -8,20 +9,22 @@ class Graph:
     def print_graph(self):
         print(self.graph)
 
-    def add_vertex(self, v):
-        if (v not in self.graph.keys()):
+    def add_vertex(self, v, heuristic=0):
+        if v not in self.graph.keys():
             self.graph[v] = []
+            self.vertices[v] = heuristic
 
-    def add_edge(self, v1, v2, weight=0, heuristic=0, directed=False):
+    def add_edge(self, v1, v2, weight=0, directed=False):
         self.add_vertex(v1)
         self.add_vertex(v2)
 
-        self.graph[v1].append([v2, weight, heuristic])
+        self.graph[v1].append([v2, weight])
         if not directed:
-            self.graph[v2].append([v1, weight, heuristic])
+            self.graph[v2].append([v1, weight])
 
-    def dijkstra(self, s, f) -> None:
+    def dijkstra(self, s, f, pretty=False) -> None:
         unvisited = list(self.graph.keys())
+
         nodes = {}
         for node in self.graph.keys():
             nodes[node] = [float('inf'), None]
@@ -34,11 +37,10 @@ class Graph:
                 if neighbour[0] not in unvisited:
                     pass
 
-                if nodes[min_node][0] + neighbour[1] < nodes[neighbour[0]][0]:
-                    nodes[neighbour[0]][0] = nodes[min_node][0] + neighbour[1]
+                if nodes[min_node][0] + self.vertices[neighbour[0]] + neighbour[1] < nodes[neighbour[0]][0]:
+                    nodes[neighbour[0]][0] = nodes[min_node][0] + self.vertices[neighbour[0]] + neighbour[1]
                     nodes[neighbour[0]][1] = min_node
             unvisited.remove(min_node)
-            nodes[min_node]
 
         path = []
         node = f
@@ -46,6 +48,11 @@ class Graph:
             path.append((node, nodes[node]))
             node = nodes[node][1]
 
+        if pretty:
+            path_simplified = []
+            for i in range(len(path)-1, -1, -1):
+                path_simplified.append(path[i][0])
+            path = ' ===> '.join(path_simplified)
         return path
 
     def a_star(self, s, f):
@@ -60,6 +67,7 @@ class Graph:
 
         # Ponemos que todos los nodos tienen una distancia infinita desde la fuente, y que todavía no sabemos qué nodo llega a ellos.
         for node in self.graph.keys():
+
             nodes[node] = [float('inf'), None, self.graph[node][2]]  # [dist. inicio, como llegar, heuristica]
         # El nodo fuente siempre tendrá una distancia de cero (pues es donde iniciamos)
         nodes[s][0] = 0
