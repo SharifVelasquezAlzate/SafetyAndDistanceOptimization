@@ -55,7 +55,7 @@ class Graph:
             path = ' ===> '.join(path_simplified)
         return path
 
-    def a_star(self, s, f):
+    def a_star(self, s, f, pretty=True):
         # En unvisited guardaremos los nodos que no hemos visitado (así no entraremos en "bucles infinitos" entre nodos)
         unvisited = list(self.graph.keys())
         # nodes será el diccionario que guarde toda la información de los nodos, específicamente tiene esta estructura:
@@ -68,14 +68,14 @@ class Graph:
         # Ponemos que todos los nodos tienen una distancia infinita desde la fuente, y que todavía no sabemos qué nodo llega a ellos.
         for node in self.graph.keys():
 
-            nodes[node] = [float('inf'), None, self.graph[node][2]]  # [dist. inicio, como llegar, heuristica]
+            nodes[node] = [float('inf'), None]  # [dist. inicio, como llegar]
         # El nodo fuente siempre tendrá una distancia de cero (pues es donde iniciamos)
         nodes[s][0] = 0
 
         # Mientras nos falten nodos por visitar...
         while unvisited:
             # Escogemos el nodo que tiene la distancia más corta hasta el momento
-            min_node = min(unvisited, key=lambda node: nodes[node][0] + nodes[node][2])
+            min_node = min(unvisited, key=lambda node: nodes[node][0])
             # Iteramos por cada uno de sus vecinos
             for neighbour in self.graph[min_node]:
                 # Si ya visitamos a ese vecino, no hacemos nada (para evitar bucles infinitos)
@@ -101,5 +101,9 @@ class Graph:
             path.append((node, nodes[node]))
             node = nodes[node][1]
 
-        path.reverse()
+        if pretty:
+            path_simplified = []
+            for i in range(len(path)-1, -1, -1):
+                path_simplified.append(path[i][0])
+            path = ' ===> '.join(path_simplified)
         return path

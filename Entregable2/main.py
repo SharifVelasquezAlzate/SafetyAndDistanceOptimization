@@ -33,4 +33,4 @@ for i in range(len(df)):
     graphy.add_edge(str(origin), str(destination), float(length_str) * 1/(1.00001 - float(row['harassmentRisk'])), bool(row['oneway']))
 
 print("Finished. Calculating Shortest Path...")
-print(graphy.dijkstra(str(source), str(target), pretty=True))
+print(graphy.a_star(str(source), str(target), pretty=True))
